@@ -2,8 +2,34 @@
 # H2 secondary storage, no Elasticsearch) + connectors runtime.
 # Adapted from the official lightweight distribution:
 # https://github.com/camunda/camunda-distributions (docker-compose-8.9)
-# Backend and frontend services are added in the dockerization phase (tasks.md group 6).
 services:
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8085:8085" # dev convenience (curl against the API); frontend uses internal DNS
+    environment:
+      - CAMUNDA_GRPC_ADDRESS=http://orchestration:26500
+      - CAMUNDA_REST_ADDRESS=http://orchestration:8080
+    mem_limit: 768m
+    restart: unless-stopped
+    networks:
+      - camunda
+    depends_on:
+      orchestration:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - camunda
+    depends_on:
+      - backend
+
   camunda-data-init:
     image: camunda/camunda:${CAMUNDA_VERSION}
     user: "0:0"

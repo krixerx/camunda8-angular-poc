@@ -39,8 +39,8 @@
 
 ## 6. Dockerization + docs (Phase 7)
 
-- [ ] 6.1 `backend/Dockerfile` (multi-stage Maven → JRE 21); wire into compose with `orchestration` service DNS env vars
-- [ ] 6.2 `frontend/Dockerfile` (Node build → nginx with `/api` reverse proxy); publish 3000:80
-- [ ] 6.3 Full-stack verify: `docker compose up --build` on clean state → both processes end-to-end at `http://localhost:3000`
-- [ ] 6.4 Update `docs/architecture.md` if topology drifted; regenerate `CLAUDE.md` with real commands; finalize README
-- [ ] 6.5 Archive this OpenSpec change (`openspec archive bootstrap-poc`) → specs promoted to `openspec/specs/`
+- [x] 6.1 `backend/Dockerfile` (multi-stage Maven → JRE 21); wire into compose with `orchestration` service DNS env vars
+- [x] 6.2 `frontend/Dockerfile` (Node build → nginx with `/api` reverse proxy); publish 3000:80
+- [x] 6.3 Full-stack verify: `docker compose up --build` → vehicle registration end-to-end at `http://localhost:3000` (backend container deployed resources, nginx proxy, form-js, worker, approve → COMPLETED)
+- [x] 6.4 Update `docs/architecture.md` if topology drifted (no drift); regenerate `CLAUDE.md` with real commands; finalize README
+- [x] 6.5 Archive this OpenSpec change (`openspec archive bootstrap-poc`) → specs promoted to `openspec/specs/`
