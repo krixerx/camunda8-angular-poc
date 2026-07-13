@@ -1,0 +1,57 @@
+# Vehicle registration (simplified)
+
+> **When to read this:** you are implementing, changing, or generating artifacts for the `vehicle-registration` process. This markdown is the source of truth for the process content; executable requirements live in `openspec/`.
+
+A citizen registers a vehicle. The system looks up the registration price automatically; a reviewer approves or rejects the registration. Deliberately minimal — the learning goals are: start form, job worker, user task with linked Camunda Form, exclusive gateway.
+
+## Flow
+
+```mermaid
+flowchart LR
+    S((Start:<br/>submit registration)) --> P[Service task:<br/>fetch-vehicle-price]
+    P --> R[/User task:<br/>review-registration/]
+    R --> G{approved?}
+    G -- true --> OK((End: Registered))
+    G -- false --> NO((End: Rejected))
+```
+
+| Element | Type | Id / job type | Notes |
+|---|---|---|---|
+| Submit registration | Start event + linked form | form `vehicle-registration-start` | Collects owner + vehicle data |
+| Fetch vehicle price | Service task | job type `fetch-vehicle-price` | Backend `@JobWorker`, hardcoded category→price map, writes `price` |
+| Review registration | User task (Camunda user task) + linked form | task `review-registration`, form `review-registration` | Shows submitted data + price; reviewer sets `approved` |
+| approved? | Exclusive gateway | — | Condition `= approved` / else |
+| Registered / Rejected | End events | — | |
+
+- **Process id:** `vehicle-registration` (BPMN file `backend/src/main/resources/processes/vehicle-registration/vehicle-registration.bpmn`)
+- **Forms:** [forms/vehicle-registration-start.md](forms/vehicle-registration-start.md), [forms/review-registration.md](forms/review-registration.md)
+
+## Process variables
+
+| Variable | Type | Set by | Meaning |
+|---|---|---|---|
+| `ownerName` | string | start form | Vehicle owner's full name |
+| `vin` | string | start form | Vehicle identification number |
+| `category` | string | start form | `car` \| `motorcycle` \| `truck` |
+| `price` | number | `fetch-vehicle-price` worker | Registration fee in EUR |
+| `approved` | boolean | review form | Reviewer decision |
+
+## Price lookup (worker behavior)
+
+Hardcoded map in the backend worker — `car` → 150, `motorcycle` → 80, `truck` → 250, anything else → 100. No external calls.
+
+## Roles / authorization
+
+None in this phase (no auth in the POC yet). Anyone can start the process and complete the review task.
+
+## Known trade-offs
+
+- Reviewer sees no vehicle registry data (no external lookup like cib7's Liiklusregister stub) — price map stands in for "integration".
+- Reject ends the process; no send-back loop (business-registration keeps it simple too; loops are a later learning step).
+
+## LLM guidance
+
+- Keep the BPMN a single pool, no lanes, left-to-right layout.
+- The user task MUST be a Camunda user task (`zeebe:userTask`) with a **linked** Camunda Form (not embedded formKey) so `/v2/user-tasks/{key}/form` returns the schema.
+- Gateway conditions in FEEL: `= approved` on the true edge; default flow to Rejected.
+- Changing fields? Update the form spec md + this variables table + the `.form` file + any worker/`@Variable` bindings together.
