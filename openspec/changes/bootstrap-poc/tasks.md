@@ -9,12 +9,12 @@
 
 ## 2. Backend middleware skeleton (Phase 3)
 
-- [ ] 2.1 Install/verify JDK 21 locally (`java -version` ≥ 21 for the build shell)
-- [ ] 2.2 Scaffold `backend/` — Spring Boot 4.0.x, Java 21, mvnw, deps: webmvc + `io.camunda:camunda-spring-boot-starter:8.9.x`
-- [ ] 2.3 Configure `application.yaml` (self-managed mode, gRPC/REST addresses env-overridable, auth none)
-- [ ] 2.4 Add `@Deployment` classpath auto-deploy + temporary `hello.bpmn`; verify deployment log and Operate
-- [ ] 2.5 Implement `/api` REST facade per backend-api spec (definitions, start-with-form, instances, tasks, task detail + form, complete) with JSON error handling
-- [ ] 2.6 Verify with curl: list definitions, start hello instance, list/complete its task; remove `hello.bpmn` once real processes exist
+- [x] 2.1 Install/verify JDK 21 locally (`java -version` ≥ 21 for the build shell)
+- [x] 2.2 Scaffold `backend/` — Spring Boot 4.0.x, Java 21, mvnw, deps: webmvc + `io.camunda:camunda-spring-boot-starter:8.9.x`
+- [x] 2.3 Configure `application.yaml` (self-managed mode, gRPC/REST addresses env-overridable, auth none)
+- [x] 2.4 Add `@Deployment` classpath auto-deploy + temporary `hello.bpmn`; verify deployment log and Operate
+- [x] 2.5 Implement `/api` REST facade per backend-api spec (definitions, start-with-form, instances, tasks, task detail + form, complete) with JSON error handling
+- [x] 2.6 Verify with curl: list definitions, start hello instance, list/complete its task (hello.bpmn removal moved to 4.4)
 
 ## 3. Frontend skeleton (Phase 4)
 
@@ -30,6 +30,7 @@
 - [ ] 4.1 Author in Desktop Modeler: `vehicle-registration.bpmn` + start form + review form (Camunda user tasks, linked forms) into `backend/src/main/resources/processes/vehicle-registration/`
 - [ ] 4.2 Implement `fetch-vehicle-price` `@JobWorker` (hardcoded category→price map)
 - [ ] 4.3 Verify end-to-end in the UI: start → price set → review task → approve → completed in Operate; also exercise reject path
+- [ ] 4.4 Remove the temporary `hello.bpmn` smoke-test process
 
 ## 5. Process 2: business registration (Phase 6)
 

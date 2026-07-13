@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Temporary smoke-test process (tasks.md 2.4). Removed once the real processes exist (2.6). -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_hello"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="hello" name="Hello (smoke test)" isExecutable="true">
+    <bpmn:startEvent id="hello-start" name="Started">
+      <bpmn:outgoing>hello-flow-1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="hello-flow-1" sourceRef="hello-start" targetRef="hello-task" />
+    <bpmn:userTask id="hello-task" name="Say hello">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>hello-flow-1</bpmn:incoming>
+      <bpmn:outgoing>hello-flow-2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="hello-flow-2" sourceRef="hello-task" targetRef="hello-end" />
+    <bpmn:endEvent id="hello-end" name="Done">
+      <bpmn:incoming>hello-flow-2</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="hello-diagram">
+    <bpmndi:BPMNPlane id="hello-plane" bpmnElement="hello">
+      <bpmndi:BPMNShape id="hello-start_di" bpmnElement="hello-start">
+        <dc:Bounds x="152" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="hello-task_di" bpmnElement="hello-task">
+        <dc:Bounds x="240" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="hello-end_di" bpmnElement="hello-end">
+        <dc:Bounds x="392" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="hello-flow-1_di" bpmnElement="hello-flow-1">
+        <di:waypoint x="188" y="100" />
+        <di:waypoint x="240" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="hello-flow-2_di" bpmnElement="hello-flow-2">
+        <di:waypoint x="340" y="100" />
+        <di:waypoint x="392" y="100" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
