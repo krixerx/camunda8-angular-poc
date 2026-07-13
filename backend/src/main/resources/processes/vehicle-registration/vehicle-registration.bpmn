@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spec: docs/business/services/vehicle-registration/README.md -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_vehicle_registration"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="vehicle-registration" name="Vehicle registration" isExecutable="true">
+    <bpmn:startEvent id="submit-registration" name="Submit registration">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="vehicle-registration-start" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>flow-to-price</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flow-to-price" sourceRef="submit-registration" targetRef="fetch-vehicle-price" />
+    <bpmn:serviceTask id="fetch-vehicle-price" name="Fetch vehicle price">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="fetch-vehicle-price" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-price</bpmn:incoming>
+      <bpmn:outgoing>flow-to-review</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="flow-to-review" sourceRef="fetch-vehicle-price" targetRef="review-registration" />
+    <bpmn:userTask id="review-registration" name="Review registration">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="review-registration" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-review</bpmn:incoming>
+      <bpmn:outgoing>flow-to-gateway</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="flow-to-gateway" sourceRef="review-registration" targetRef="approved-gateway" />
+    <bpmn:exclusiveGateway id="approved-gateway" name="approved?" default="flow-rejected">
+      <bpmn:incoming>flow-to-gateway</bpmn:incoming>
+      <bpmn:outgoing>flow-approved</bpmn:outgoing>
+      <bpmn:outgoing>flow-rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="flow-approved" name="yes" sourceRef="approved-gateway" targetRef="end-registered">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= approved</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow-rejected" name="no" sourceRef="approved-gateway" targetRef="end-rejected" />
+    <bpmn:endEvent id="end-registered" name="Registered">
+      <bpmn:incoming>flow-approved</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="end-rejected" name="Rejected">
+      <bpmn:incoming>flow-rejected</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagram-vehicle-registration">
+    <bpmndi:BPMNPlane id="plane-vehicle-registration" bpmnElement="vehicle-registration">
+      <bpmndi:BPMNShape id="submit-registration_di" bpmnElement="submit-registration">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fetch-vehicle-price_di" bpmnElement="fetch-vehicle-price">
+        <dc:Bounds x="250" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review-registration_di" bpmnElement="review-registration">
+        <dc:Bounds x="410" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="approved-gateway_di" bpmnElement="approved-gateway" isMarkerVisible="true">
+        <dc:Bounds x="575" y="95" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end-registered_di" bpmnElement="end-registered">
+        <dc:Bounds x="702" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end-rejected_di" bpmnElement="end-rejected">
+        <dc:Bounds x="702" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow-to-price_di" bpmnElement="flow-to-price">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-review_di" bpmnElement="flow-to-review">
+        <di:waypoint x="350" y="120" />
+        <di:waypoint x="410" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-gateway_di" bpmnElement="flow-to-gateway">
+        <di:waypoint x="510" y="120" />
+        <di:waypoint x="575" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-approved_di" bpmnElement="flow-approved">
+        <di:waypoint x="625" y="120" />
+        <di:waypoint x="702" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-rejected_di" bpmnElement="flow-rejected">
+        <di:waypoint x="600" y="145" />
+        <di:waypoint x="600" y="240" />
+        <di:waypoint x="702" y="240" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

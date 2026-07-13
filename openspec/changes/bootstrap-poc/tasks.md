@@ -27,10 +27,10 @@
 
 ## 4. Process 1: vehicle registration (Phase 5)
 
-- [ ] 4.1 Author in Desktop Modeler: `vehicle-registration.bpmn` + start form + review form (Camunda user tasks, linked forms) into `backend/src/main/resources/processes/vehicle-registration/`
-- [ ] 4.2 Implement `fetch-vehicle-price` `@JobWorker` (hardcoded category→price map)
-- [ ] 4.3 Verify end-to-end in the UI: start → price set → review task → approve → completed in Operate; also exercise reject path
-- [ ] 4.4 Remove the temporary `hello.bpmn` smoke-test process
+- [x] 4.1 Author `vehicle-registration.bpmn` + start form + review form (Camunda user tasks, linked forms) into `backend/src/main/resources/processes/vehicle-registration/` (authored as XML/JSON per the business spec; Modeler-compatible)
+- [x] 4.2 Implement `fetch-vehicle-price` `@JobWorker` (hardcoded category→price map)
+- [x] 4.3 Verify end-to-end in the UI: start → price set → review task → approve → end-registered; reject path → end-rejected (verified via element-instance search)
+- [x] 4.4 Remove the temporary `hello.bpmn` smoke-test process
 
 ## 5. Process 2: business registration (Phase 6)
 

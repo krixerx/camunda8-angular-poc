@@ -1,0 +1,50 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "id": "review-registration",
+  "type": "default",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.9.0",
+  "schemaVersion": 18,
+  "components": [
+    {
+      "type": "text",
+      "id": "intro",
+      "text": "## Review registration\nCheck the submitted data and the calculated fee, then approve or reject."
+    },
+    {
+      "type": "textfield",
+      "id": "field-ownerName",
+      "key": "ownerName",
+      "label": "Owner name",
+      "readonly": true
+    },
+    {
+      "type": "textfield",
+      "id": "field-vin",
+      "key": "vin",
+      "label": "VIN",
+      "readonly": true
+    },
+    {
+      "type": "textfield",
+      "id": "field-category",
+      "key": "category",
+      "label": "Vehicle category",
+      "readonly": true
+    },
+    {
+      "type": "number",
+      "id": "field-price",
+      "key": "price",
+      "label": "Registration fee (EUR)",
+      "readonly": true
+    },
+    {
+      "type": "checkbox",
+      "id": "field-approved",
+      "key": "approved",
+      "label": "Approve this registration",
+      "defaultValue": false
+    }
+  ]
+}

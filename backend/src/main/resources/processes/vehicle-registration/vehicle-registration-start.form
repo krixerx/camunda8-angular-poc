@@ -1,0 +1,50 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "id": "vehicle-registration-start",
+  "type": "default",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.9.0",
+  "schemaVersion": 18,
+  "components": [
+    {
+      "type": "text",
+      "id": "intro",
+      "text": "## Vehicle registration\nSubmit the owner and vehicle data to register a vehicle."
+    },
+    {
+      "type": "textfield",
+      "id": "field-ownerName",
+      "key": "ownerName",
+      "label": "Owner name",
+      "validate": {
+        "required": true,
+        "minLength": 2
+      }
+    },
+    {
+      "type": "textfield",
+      "id": "field-vin",
+      "key": "vin",
+      "label": "VIN",
+      "description": "17 characters, capital letters and digits, no I/O/Q",
+      "validate": {
+        "required": true,
+        "pattern": "[A-HJ-NPR-Z0-9]{17}"
+      }
+    },
+    {
+      "type": "select",
+      "id": "field-category",
+      "key": "category",
+      "label": "Vehicle category",
+      "values": [
+        { "label": "Car", "value": "car" },
+        { "label": "Motorcycle", "value": "motorcycle" },
+        { "label": "Truck", "value": "truck" }
+      ],
+      "validate": {
+        "required": true
+      }
+    }
+  ]
+}
