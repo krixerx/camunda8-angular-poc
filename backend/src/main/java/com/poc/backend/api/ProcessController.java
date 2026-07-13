@@ -1,9 +1,12 @@
 package com.poc.backend.api;
 
+import com.poc.backend.api.dto.ProcessDefinitionDto;
+import com.poc.backend.api.dto.ProcessInstanceDto;
+import com.poc.backend.api.dto.StartInstanceRequest;
+import com.poc.backend.api.dto.StartInstanceResponse;
 import io.camunda.client.CamundaClient;
 import io.camunda.client.api.command.ProblemException;
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,9 +30,6 @@ public class ProcessController {
     this.objectMapper = objectMapper;
   }
 
-  public record ProcessDefinitionDto(
-      long processDefinitionKey, String processDefinitionId, String name, int version) {}
-
   @GetMapping("/process-definitions")
   public List<ProcessDefinitionDto> processDefinitions() {
     return client
@@ -41,13 +41,7 @@ public class ProcessController {
         .join()
         .items()
         .stream()
-        .map(
-            pd ->
-                new ProcessDefinitionDto(
-                    pd.getProcessDefinitionKey(),
-                    pd.getProcessDefinitionId(),
-                    pd.getName() != null ? pd.getName() : pd.getProcessDefinitionId(),
-                    pd.getVersion()))
+        .map(ProcessDefinitionDto::from)
         .toList();
   }
 
@@ -67,13 +61,10 @@ public class ProcessController {
     }
   }
 
-  public record StartInstanceRequest(Map<String, Object> variables) {}
-
-  public record StartInstanceResponse(long processInstanceKey) {}
-
   @PostMapping("/process-definitions/{processDefinitionId}/start")
   public StartInstanceResponse start(
-      @PathVariable String processDefinitionId, @RequestBody(required = false) StartInstanceRequest request) {
+      @PathVariable String processDefinitionId,
+      @RequestBody(required = false) StartInstanceRequest request) {
     var command =
         client.newCreateInstanceCommand().bpmnProcessId(processDefinitionId).latestVersion();
     if (request != null && request.variables() != null && !request.variables().isEmpty()) {
@@ -82,14 +73,6 @@ public class ProcessController {
     var event = command.send().join();
     return new StartInstanceResponse(event.getProcessInstanceKey());
   }
-
-  public record ProcessInstanceDto(
-      long processInstanceKey,
-      String processDefinitionId,
-      String processDefinitionName,
-      String state,
-      String startDate,
-      String endDate) {}
 
   @GetMapping("/process-instances")
   public List<ProcessInstanceDto> processInstances() {
@@ -100,15 +83,7 @@ public class ProcessController {
         .join()
         .items()
         .stream()
-        .map(
-            pi ->
-                new ProcessInstanceDto(
-                    pi.getProcessInstanceKey(),
-                    pi.getProcessDefinitionId(),
-                    pi.getProcessDefinitionName(),
-                    pi.getState() != null ? pi.getState().name() : null,
-                    pi.getStartDate() != null ? pi.getStartDate().toString() : null,
-                    pi.getEndDate() != null ? pi.getEndDate().toString() : null))
+        .map(ProcessInstanceDto::from)
         .toList();
   }
 }

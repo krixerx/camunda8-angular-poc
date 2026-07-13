@@ -1,5 +1,6 @@
 package com.poc.backend.api;
 
+import com.poc.backend.api.dto.ApiError;
 import io.camunda.client.api.command.ClientException;
 import io.camunda.client.api.command.ProblemException;
 import java.util.concurrent.CompletionException;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiExceptionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
-
-  public record ApiError(int status, String message) {}
 
   @ExceptionHandler(ProblemException.class)
   public ResponseEntity<ApiError> problem(ProblemException e) {

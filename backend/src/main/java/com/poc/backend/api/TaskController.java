@@ -1,9 +1,11 @@
 package com.poc.backend.api;
 
+import com.poc.backend.api.dto.CompleteTaskRequest;
+import com.poc.backend.api.dto.TaskDetailDto;
+import com.poc.backend.api.dto.TaskDto;
 import io.camunda.client.CamundaClient;
 import io.camunda.client.api.command.ProblemException;
 import io.camunda.client.api.search.enums.UserTaskState;
-import io.camunda.client.api.search.response.UserTask;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +31,6 @@ public class TaskController {
     this.objectMapper = objectMapper;
   }
 
-  public record TaskDto(
-      long userTaskKey,
-      String name,
-      String elementId,
-      String processDefinitionId,
-      String processName,
-      long processInstanceKey,
-      String creationDate,
-      String state) {}
-
   @GetMapping
   public List<TaskDto> openTasks() {
     return client
@@ -49,19 +41,15 @@ public class TaskController {
         .join()
         .items()
         .stream()
-        .map(TaskController::toDto)
+        .map(TaskDto::from)
         .toList();
   }
-
-  public record TaskDetailDto(TaskDto task, JsonNode formSchema, Map<String, Object> variables) {}
 
   @GetMapping("/{userTaskKey}")
   public TaskDetailDto taskDetail(@PathVariable long userTaskKey) {
     var task = client.newUserTaskGetRequest(userTaskKey).send().join();
-    return new TaskDetailDto(toDto(task), formSchema(userTaskKey), variables(userTaskKey));
+    return new TaskDetailDto(TaskDto.from(task), formSchema(userTaskKey), variables(userTaskKey));
   }
-
-  public record CompleteTaskRequest(Map<String, Object> variables) {}
 
   @PostMapping("/{userTaskKey}/complete")
   public void complete(
@@ -71,18 +59,6 @@ public class TaskController {
       command = command.variables(request.variables());
     }
     command.send().join();
-  }
-
-  private static TaskDto toDto(UserTask task) {
-    return new TaskDto(
-        task.getUserTaskKey(),
-        task.getName(),
-        task.getElementId(),
-        task.getBpmnProcessId(),
-        task.getProcessName(),
-        task.getProcessInstanceKey(),
-        task.getCreationDate() != null ? task.getCreationDate().toString() : null,
-        task.getState() != null ? task.getState().name() : null);
   }
 
   private JsonNode formSchema(long userTaskKey) {
