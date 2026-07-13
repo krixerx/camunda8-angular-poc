@@ -16,7 +16,7 @@ flowchart LR
 | Component | Tech | Responsibility |
 |---|---|---|
 | `frontend/` | Angular 22, `@bpmn-io/form-js-viewer` | Services catalog, task list, Camunda Form rendering, process overview. Talks **only** to the backend. |
-| `backend/` | Spring Boot 4.0.x, Java 21, `io.camunda:camunda-spring-boot-starter` 8.9.x | Auto-deploys BPMN/DMN/forms at startup, hosts `@JobWorker`s, exposes the thin `/api` facade over the Orchestration Cluster REST API v2. |
+| `backend/` | Spring Boot 4.0.x, Java 21, `io.camunda:camunda-spring-boot-starter` 8.9.x | Auto-deploys BPMN/DMN/forms at startup, hosts `@JobWorker`s, exposes the thin `/api` facade over the Orchestration Cluster REST API v2. Protocol note: the 8.9 client defaults to `prefer-rest-over-grpc=true`, so effectively all traffic uses REST (8080); gRPC (26500) is configured but only used by gRPC-only features such as job *streaming* (our workers poll). |
 | orchestration cluster | `camunda/camunda:8.9.x` (single image: Zeebe + Operate + Tasklist + Identity) | Executes BPMN/DMN (FEEL engine), manages user tasks, bundled UIs at `/operate` and `/tasklist`. H2 secondary storage — **no Elasticsearch**. |
 | connectors | `camunda/connectors-bundle` | Present for later experiments; the two POC processes use plain job workers. |
 
