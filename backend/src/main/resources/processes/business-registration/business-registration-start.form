@@ -1,0 +1,46 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "id": "business-registration-start",
+  "type": "default",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.9.0",
+  "schemaVersion": 18,
+  "components": [
+    {
+      "type": "text",
+      "id": "intro",
+      "text": "## Business registration\nRegister a company (OÜ). Applications with fully paid minimum share capital (≥ 2500 EUR) from adult founders are approved automatically."
+    },
+    {
+      "type": "textfield",
+      "id": "field-companyName",
+      "key": "companyName",
+      "label": "Company name",
+      "validate": {
+        "required": true,
+        "minLength": 3
+      }
+    },
+    {
+      "type": "number",
+      "id": "field-shareCapital",
+      "key": "shareCapital",
+      "label": "Share capital (EUR)",
+      "validate": {
+        "required": true,
+        "min": 1
+      }
+    },
+    {
+      "type": "number",
+      "id": "field-founderAge",
+      "key": "founderAge",
+      "label": "Founder age",
+      "validate": {
+        "required": true,
+        "min": 1,
+        "max": 120
+      }
+    }
+  ]
+}

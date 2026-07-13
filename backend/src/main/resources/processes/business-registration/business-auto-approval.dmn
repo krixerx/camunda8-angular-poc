@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spec: docs/business/services/business-registration/decisions/business-auto-approval.md -->
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             id="Definitions_business_auto_approval"
+             name="business-auto-approval"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="business-auto-approval" name="Business auto approval">
+    <decisionTable id="decision-table-business-auto-approval" hitPolicy="FIRST">
+      <input id="input-share-capital" label="Share capital (EUR)">
+        <inputExpression id="input-expression-share-capital" typeRef="number">
+          <text>shareCapital</text>
+        </inputExpression>
+      </input>
+      <input id="input-founder-age" label="Founder age">
+        <inputExpression id="input-expression-founder-age" typeRef="number">
+          <text>founderAge</text>
+        </inputExpression>
+      </input>
+      <output id="output-auto-approved" label="Auto approved" name="autoApproved" typeRef="boolean" />
+      <rule id="rule-auto-approve">
+        <description>Fully paid minimum capital + adult founder → no review needed</description>
+        <inputEntry id="rule1-capital"><text>&gt;= 2500</text></inputEntry>
+        <inputEntry id="rule1-age"><text>&gt;= 18</text></inputEntry>
+        <outputEntry id="rule1-out"><text>true</text></outputEntry>
+      </rule>
+      <rule id="rule-manual-review">
+        <description>Everything else goes to manual review</description>
+        <inputEntry id="rule2-capital"><text>-</text></inputEntry>
+        <inputEntry id="rule2-age"><text>-</text></inputEntry>
+        <outputEntry id="rule2-out"><text>false</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="dmn-diagram">
+      <dmndi:DMNShape id="dmn-shape-decision" dmnElementRef="business-auto-approval">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

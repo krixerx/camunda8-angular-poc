@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spec: docs/business/services/business-registration/README.md -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_business_registration"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="business-registration" name="Business registration" isExecutable="true">
+    <bpmn:startEvent id="submit-application" name="Submit application">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="business-registration-start" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>flow-to-decision</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flow-to-decision" sourceRef="submit-application" targetRef="auto-approval-decision" />
+    <bpmn:businessRuleTask id="auto-approval-decision" name="Auto-approval decision">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="business-auto-approval" resultVariable="autoApproved" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-decision</bpmn:incoming>
+      <bpmn:outgoing>flow-to-auto-gateway</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="flow-to-auto-gateway" sourceRef="auto-approval-decision" targetRef="auto-approved-gateway" />
+    <bpmn:exclusiveGateway id="auto-approved-gateway" name="auto-approved?" default="flow-to-review">
+      <bpmn:incoming>flow-to-auto-gateway</bpmn:incoming>
+      <bpmn:outgoing>flow-auto-approved</bpmn:outgoing>
+      <bpmn:outgoing>flow-to-review</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="flow-auto-approved" name="yes" sourceRef="auto-approved-gateway" targetRef="end-registered">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= autoApproved</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow-to-review" name="no" sourceRef="auto-approved-gateway" targetRef="review-application" />
+    <bpmn:userTask id="review-application" name="Review application">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="review-application" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-review</bpmn:incoming>
+      <bpmn:outgoing>flow-to-approved-gateway</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="flow-to-approved-gateway" sourceRef="review-application" targetRef="approved-gateway" />
+    <bpmn:exclusiveGateway id="approved-gateway" name="approved?" default="flow-rejected">
+      <bpmn:incoming>flow-to-approved-gateway</bpmn:incoming>
+      <bpmn:outgoing>flow-approved</bpmn:outgoing>
+      <bpmn:outgoing>flow-rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="flow-approved" name="yes" sourceRef="approved-gateway" targetRef="end-registered">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= approved</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow-rejected" name="no" sourceRef="approved-gateway" targetRef="end-rejected" />
+    <bpmn:endEvent id="end-registered" name="Registered">
+      <bpmn:incoming>flow-auto-approved</bpmn:incoming>
+      <bpmn:incoming>flow-approved</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="end-rejected" name="Rejected">
+      <bpmn:incoming>flow-rejected</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagram-business-registration">
+    <bpmndi:BPMNPlane id="plane-business-registration" bpmnElement="business-registration">
+      <bpmndi:BPMNShape id="submit-application_di" bpmnElement="submit-application">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auto-approval-decision_di" bpmnElement="auto-approval-decision">
+        <dc:Bounds x="250" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auto-approved-gateway_di" bpmnElement="auto-approved-gateway" isMarkerVisible="true">
+        <dc:Bounds x="415" y="95" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review-application_di" bpmnElement="review-application">
+        <dc:Bounds x="520" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="approved-gateway_di" bpmnElement="approved-gateway" isMarkerVisible="true">
+        <dc:Bounds x="685" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end-registered_di" bpmnElement="end-registered">
+        <dc:Bounds x="822" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end-rejected_di" bpmnElement="end-rejected">
+        <dc:Bounds x="822" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow-to-decision_di" bpmnElement="flow-to-decision">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-auto-gateway_di" bpmnElement="flow-to-auto-gateway">
+        <di:waypoint x="350" y="120" />
+        <di:waypoint x="415" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-auto-approved_di" bpmnElement="flow-auto-approved">
+        <di:waypoint x="465" y="120" />
+        <di:waypoint x="822" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-review_di" bpmnElement="flow-to-review">
+        <di:waypoint x="440" y="145" />
+        <di:waypoint x="440" y="240" />
+        <di:waypoint x="520" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-approved-gateway_di" bpmnElement="flow-to-approved-gateway">
+        <di:waypoint x="620" y="240" />
+        <di:waypoint x="685" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-approved_di" bpmnElement="flow-approved">
+        <di:waypoint x="710" y="215" />
+        <di:waypoint x="710" y="120" />
+        <di:waypoint x="822" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-rejected_di" bpmnElement="flow-rejected">
+        <di:waypoint x="735" y="240" />
+        <di:waypoint x="822" y="240" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

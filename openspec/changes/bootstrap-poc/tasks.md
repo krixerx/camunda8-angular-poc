@@ -34,8 +34,8 @@
 
 ## 5. Process 2: business registration (Phase 6)
 
-- [ ] 5.1 Author `business-registration.bpmn` + `business-auto-approval.dmn` + start/review forms into `backend/src/main/resources/processes/business-registration/`
-- [ ] 5.2 Verify auto-approve run (capital ≥ 2500, adult) ends without user task; manual run creates review task; approve + reject paths both end correctly
+- [x] 5.1 Author `business-registration.bpmn` + `business-auto-approval.dmn` + start/review forms into `backend/src/main/resources/processes/business-registration/`
+- [x] 5.2 Verify auto-approve run (capital ≥ 2500, adult) ends without user task; manual run creates review task; approve + reject paths both end correctly (all verified via element-instance + decision-instance search)
 
 ## 6. Dockerization + docs (Phase 7)
 

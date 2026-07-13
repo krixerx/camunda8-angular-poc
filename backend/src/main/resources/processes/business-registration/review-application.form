@@ -1,0 +1,43 @@
+{
+  "$schema": "https://unpkg.com/@camunda/form-json-schema/resources/schema.json",
+  "id": "review-application",
+  "type": "default",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.9.0",
+  "schemaVersion": 18,
+  "components": [
+    {
+      "type": "text",
+      "id": "intro",
+      "text": "## Review application\nThis application was not auto-approved. Check the data and approve or reject."
+    },
+    {
+      "type": "textfield",
+      "id": "field-companyName",
+      "key": "companyName",
+      "label": "Company name",
+      "readonly": true
+    },
+    {
+      "type": "number",
+      "id": "field-shareCapital",
+      "key": "shareCapital",
+      "label": "Share capital (EUR)",
+      "readonly": true
+    },
+    {
+      "type": "number",
+      "id": "field-founderAge",
+      "key": "founderAge",
+      "label": "Founder age",
+      "readonly": true
+    },
+    {
+      "type": "checkbox",
+      "id": "field-approved",
+      "key": "approved",
+      "label": "Approve this application",
+      "defaultValue": false
+    }
+  ]
+}
