@@ -18,12 +18,12 @@
 
 ## 3. Frontend skeleton (Phase 4)
 
-- [ ] 3.1 Scaffold `frontend/` — `ng new` Angular 22, standalone, routing, strict; dev proxy `/api` → 8085
-- [ ] 3.2 Build the form-js wrapper component (`@bpmn-io/form-js-viewer`, CSS, submit/validation events, teardown)
-- [ ] 3.3 Services page: catalog from `/api/process-definitions`, start form dialog/page → start endpoint
-- [ ] 3.4 Tasks page + Task detail page (form-js render, complete, navigate back)
-- [ ] 3.5 Processes page: instance list with state
-- [ ] 3.6 Verify in browser against local backend + cluster
+- [x] 3.1 Scaffold `frontend/` — `ng new` Angular 22, standalone, routing, strict; dev proxy `/api` → 8085
+- [x] 3.2 Build the form-js wrapper component (`@bpmn-io/form-js-viewer`, CSS, submit/validation events, teardown) — form rendering exercised with real schemas in 4.3
+- [x] 3.3 Services page: catalog from `/api/process-definitions`, start form dialog/page → start endpoint
+- [x] 3.4 Tasks page + Task detail page (form-js render, complete, navigate back)
+- [x] 3.5 Processes page: instance list with state
+- [x] 3.6 Verify in browser against local backend + cluster (headless browser: full start→task→complete→completed-instance cycle)
 
 ## 4. Process 1: vehicle registration (Phase 5)
 

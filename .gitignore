@@ -31,3 +31,4 @@ camunda-data/
 
 # --- Misc ---
 *.swp
+.gstack/
