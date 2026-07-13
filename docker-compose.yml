@@ -1,0 +1,84 @@
+# Local dev/POC stack — Camunda 8.9 orchestration cluster (Zeebe + Operate + Tasklist,
+# H2 secondary storage, no Elasticsearch) + connectors runtime.
+# Adapted from the official lightweight distribution:
+# https://github.com/camunda/camunda-distributions (docker-compose-8.9)
+# Backend and frontend services are added in the dockerization phase (tasks.md group 6).
+services:
+  camunda-data-init:
+    image: camunda/camunda:${CAMUNDA_VERSION}
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c", "chown -R 1001:1001 /usr/local/camunda/camunda-data && chmod 775 /usr/local/camunda/camunda-data"]
+    volumes:
+      - camunda-data:/usr/local/camunda/camunda-data
+    restart: "no"
+
+  orchestration: # consolidated Zeebe + Operate + Tasklist + Identity
+    image: camunda/camunda:${CAMUNDA_VERSION}
+    container_name: orchestration
+    ports:
+      - "26500:26500" # Zeebe gRPC gateway
+      - "8080:8080"   # REST API v2 + /operate + /tasklist UIs
+      - "9600:9600"   # management/actuator
+    mem_limit: 1g
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/9600 && echo -e \"GET /actuator/health/status HTTP/1.1\r\nHost: localhost\r\n\r\n\" >&3 && head -n 1 <&3'"]
+      interval: 1s
+      retries: 30
+      start_period: 30s
+    volumes:
+      - camunda:/usr/local/camunda/data
+      - camunda-data:/usr/local/camunda/camunda-data
+    configs:
+      - source: orchestration-config
+        target: /usr/local/camunda/config/application.yaml
+    networks:
+      - camunda
+    depends_on:
+      camunda-data-init:
+        condition: service_completed_successfully
+
+  connectors:
+    image: camunda/connectors-bundle:${CAMUNDA_CONNECTORS_VERSION}
+    container_name: connectors
+    ports:
+      - "8086:8080"
+    environment:
+      - management.endpoints.web.exposure.include=health,configprops
+      - management.endpoint.health.probes.enabled=true
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health/readiness"]
+      interval: 30s
+      timeout: 1s
+      retries: 5
+      start_period: 30s
+    configs:
+      - source: connectors-config
+        target: application.yaml
+    networks:
+      - camunda
+    depends_on:
+      orchestration:
+        condition: service_healthy
+
+volumes:
+  camunda:
+  camunda-data:
+
+networks:
+  camunda:
+    name: camunda
+
+configs:
+  connectors-config:
+    content: |
+      camunda:
+        client:
+          mode: self-managed
+          grpc-address: http://orchestration:26500
+          rest-address: http://orchestration:8080
+
+  orchestration-config:
+    file: ./docker/camunda/${ORCHESTRATION_CONFIG_FILE:-application-h2.yaml}

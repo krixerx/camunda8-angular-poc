@@ -2,10 +2,10 @@
 
 ## 1. Camunda platform (Phase 2)
 
-- [ ] 1.1 Fetch the official Camunda 8.9 lightweight docker-compose distribution; pin latest 8.9.x / connectors patch tags in `.env`
-- [ ] 1.2 Adapt it: `docker-compose.yml` at repo root, orchestration config in `docker/camunda/application-h2.yaml` (basic auth, `unprotectedApi: true`, demo/demo user, H2 on named volume)
-- [ ] 1.3 Verify: `docker compose up -d` → `GET /v2/topology` OK; Operate + Tasklist UIs log in with demo/demo
-- [ ] 1.4 Verify restart persistence: deploy anything via Modeler, `docker compose restart`, definition still present
+- [x] 1.1 Fetch the official Camunda 8.9 lightweight docker-compose distribution; pin latest 8.9.x / connectors patch tags in `.env`
+- [x] 1.2 Adapt it: `docker-compose.yml` at repo root, orchestration config in `docker/camunda/application-h2.yaml` (basic auth, `unprotectedApi: true`, demo/demo user, H2 on named volume)
+- [x] 1.3 Verify: `docker compose up -d` → `GET /v2/topology` OK; Operate + Tasklist UIs log in with demo/demo
+- [x] 1.4 Verify restart persistence: deploy anything via Modeler, `docker compose restart`, definition still present
 
 ## 2. Backend middleware skeleton (Phase 3)
 
