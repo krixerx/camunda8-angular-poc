@@ -1,0 +1,33 @@
+# --- Java / Maven (backend) ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+hs_err_pid*
+
+# --- Node / Angular (frontend) ---
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.factorypath
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Docker / runtime data ---
+.data/
+camunda-data/
+*.env.local
+
+# --- Misc ---
+*.swp
