@@ -1,8 +1,7 @@
-# frontend-app Specification
+# frontend-app Specification (delta)
 
-## Purpose
-TBD - created by archiving change bootstrap-poc. Update Purpose after archive.
-## Requirements
+## MODIFIED Requirements
+
 ### Requirement: Angular SPA talks only to the backend
 The `frontend/` module SHALL be an Angular 22 application (standalone components, strict TypeScript) that calls only the backend `/api/**` endpoints for business data — never the Camunda API directly. The single permitted exception is the Keycloak server at `http://localhost:8180`, which the SPA calls directly for OIDC login and token operations. In development, `ng serve` SHALL proxy `/api` to `http://localhost:8085`.
 
@@ -14,33 +13,7 @@ The `frontend/` module SHALL be an Angular 22 application (standalone components
 - **WHEN** the SPA is exercised end-to-end
 - **THEN** every outgoing request targets either `/api/**` (same-origin) or the Keycloak realm endpoints — none target the Camunda cluster
 
-### Requirement: Services page starts processes
-A Services page SHALL list the deployed process definitions from `GET /api/process-definitions`. Starting a service SHALL render its start form (if any) with form-js and submit the values to `POST /api/process-definitions/{key}/start`.
-
-#### Scenario: Start a process from the catalog
-- **WHEN** the user opens the Services page, chooses "Vehicle registration", fills the start form, and submits
-- **THEN** a new process instance is created and the user is navigated to a confirmation (or the created task)
-
-### Requirement: Tasks page lists and opens user tasks
-A Tasks page SHALL list open user tasks from `GET /api/tasks`. Opening a task SHALL show a Task detail view that renders the task's Camunda Form schema with `@bpmn-io/form-js-viewer`, pre-filled from current variables, and completes the task via `POST /api/tasks/{key}/complete`.
-
-#### Scenario: Complete a review task
-- **WHEN** the user opens a "Review registration" task, edits the form, and submits
-- **THEN** the task completes, the user returns to the Tasks page, and the task is gone from the list
-
-### Requirement: form-js wrapper component
-Camunda Form rendering SHALL be encapsulated in a single reusable Angular component that instantiates the form-js viewer on an element ref, imports the required form-js CSS, emits submit events with `{ data, errors }`, blocks submission when validation errors exist, and destroys the viewer on component teardown.
-
-#### Scenario: Client-side validation
-- **WHEN** the user submits a form with a required field empty
-- **THEN** form-js shows the validation error and no request is sent to the backend
-
-### Requirement: Processes page shows instances
-A Processes page SHALL list process instances from `GET /api/process-instances` with their state (active/completed) and start date.
-
-#### Scenario: Completed instance visible
-- **WHEN** a process instance finishes and the user opens the Processes page
-- **THEN** the instance is listed with state "completed"
+## ADDED Requirements
 
 ### Requirement: Login via Keycloak
 The SPA SHALL initialize Keycloak (OIDC Authorization Code + PKCE, client `poc-frontend`) at bootstrap with login-required semantics: an unauthenticated visitor is redirected to the Keycloak login page and returns to the app after authenticating. The app SHALL display the logged-in user's username and role, and offer a logout action that ends the Keycloak session and returns to the login screen.
@@ -70,4 +43,3 @@ Navigation and routes SHALL be gated by realm role: Services and start-process p
 #### Scenario: homer sees the civil-servant UI
 - **WHEN** `homer` logs in
 - **THEN** the nav shows Tasks and Processes (not Services), and homer can open and complete a review task
-

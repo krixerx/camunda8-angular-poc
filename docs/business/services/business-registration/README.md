@@ -42,7 +42,14 @@ flowchart LR
 
 ## Roles / authorization
 
-None in this phase (no auth in the POC yet).
+Keycloak realm roles (realm `camunda-poc`, see `docker/keycloak/realm-export.json`):
+
+| Role | Who | May do |
+|---|---|---|
+| `applicant` | citizen (demo user `bart`) | Start the process (submit application form) |
+| `civil-servant` | official (demo user `homer`) | Complete the `review-application` user task (manual path) |
+
+Any authenticated user may read process/task lists. Enforced by the backend (`SecurityConfig`) and mirrored in the frontend nav/route guards. The DMN auto-approval path involves no human role at all.
 
 ## Known trade-offs
 

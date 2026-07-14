@@ -28,6 +28,39 @@
   background: #fca31133;
 }
 
+.user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.user-role {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  background: #ffffff1a;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.logout {
+  background: transparent;
+  color: #cbd5e1;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+
+.logout:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
 main {
   max-width: 860px;
   margin: 0 auto;

@@ -42,7 +42,14 @@ Hardcoded map in the backend worker — `car` → 150, `motorcycle` → 80, `tru
 
 ## Roles / authorization
 
-None in this phase (no auth in the POC yet). Anyone can start the process and complete the review task.
+Keycloak realm roles (realm `camunda-poc`, see `docker/keycloak/realm-export.json`):
+
+| Role | Who | May do |
+|---|---|---|
+| `applicant` | citizen (demo user `bart`) | Start the process (submit registration form) |
+| `civil-servant` | official (demo user `homer`) | Complete the `review-registration` user task |
+
+Any authenticated user may read process/task lists. Enforced by the backend (`SecurityConfig`) and mirrored in the frontend nav/route guards. No task assignment yet — every civil servant sees every open review task.
 
 ## Known trade-offs
 

@@ -13,8 +13,8 @@ Learning POC mirroring `C:\Users\kriks\git\cib7-react-poc` (CIB seven + React) o
 docker compose up --build -d          # frontend :3000, backend :8085, Camunda :8080/:26500
 docker compose down                   # -v wipes Camunda data (clean slate)
 
-# Dev loop (cluster in Docker, apps local)
-docker compose up -d orchestration connectors
+# Dev loop (cluster + Keycloak in Docker, apps local)
+docker compose up -d orchestration connectors keycloak
 cd backend && ./mvnw spring-boot:run  # :8085 — needs JDK 21+ (JAVA_HOME, not global PATH java=11)
 cd frontend && npm start              # :4200, proxies /api -> :8085 — needs Node >= 22.22.3
 
@@ -29,9 +29,11 @@ cd frontend && npx ng test            # vitest unit tests
 
 Camunda UIs: http://localhost:8080/operate and `/tasklist`, login `demo`/`demo`. API v2 is unprotected in dev (`docker/camunda/application-h2.yaml`).
 
+Auth: Keycloak :8180 (admin `admin`/`admin`), realm `camunda-poc` auto-imported from `docker/keycloak/realm-export.json`. App users: `bart`/`bart` (role `applicant`, starts processes), `homer`/`homer` (role `civil-servant`, completes tasks). `/api/**` needs a bearer token — dev curl recipe (password grant) is in README.md.
+
 ## Architecture (read docs/architecture.md for detail)
 
-Browser → Angular (`/api` same-origin; nginx proxy in Docker, ng-serve proxy in dev) → Spring Boot facade (`com.poc.backend.api`, thin controllers + DTO records in `api/dto` with static `from()` mappers) → `CamundaClient` → Orchestration Cluster **REST API v2 only** (v1 Tasklist/Operate APIs are removed in 8.10; client default `prefer-rest-over-grpc=true`, gRPC only for job streaming).
+Browser → Keycloak login (keycloak-angular, code + PKCE, `login-required`; bearer interceptor + role route guards in `frontend/src/app/core/`) → Angular (`/api` same-origin; nginx proxy in Docker, ng-serve proxy in dev) → Spring Boot facade (`com.poc.backend.api`, thin controllers + DTO records in `api/dto` with static `from()` mappers) → `CamundaClient` → Orchestration Cluster **REST API v2 only** (v1 Tasklist/Operate APIs are removed in 8.10; client default `prefer-rest-over-grpc=true`, gRPC only for job streaming).
 
 BPMN/DMN/`.form` files live in `backend/src/main/resources/processes/<service>/` and auto-deploy at startup via `@Deployment` on `BackendApplication`. Job workers (`@JobWorker`) in `com.poc.backend.worker`. User tasks are **Camunda user tasks** (`zeebe:userTask`) with **linked forms** (`bindingType="deployment"`); DMN via `zeebe:calledDecision` (`bindingType="deployment"`). Frontend renders form schemas with `@bpmn-io/form-js-viewer` wrapped in `shared/form-viewer.ts`.
 
@@ -53,3 +55,6 @@ BPMN/DMN/`.form` files live in `backend/src/main/resources/processes/<service>/`
 - `httpclient5.version` is pinned to 5.6.x in `backend/pom.xml` (Camunda client needs ≥ 5.6; Spring Boot 4.0 manages 5.5.x).
 - Local toolchain: global `java` is 11 — always build via `mvnw` with `JAVA_HOME` pointing to JDK 21 (`C:\Program Files\Java\jdk-21`). Node via nvm, ≥ 22.22.3.
 - git-bash curl mangles non-ASCII JSON bodies; test unicode through the browser.
+- Keycloak issuer is pinned to `http://localhost:8180` (`KC_HOSTNAME_URL`) so browser- and container-validated tokens agree on `iss`. The backend fetches JWKS via a reachable URL (`KEYCLOAK_JWKS_URI`, service DNS in Docker) but validates `iss` against the canonical localhost URL — don't "simplify" either side or Docker mode breaks.
+- Realm JSON is only imported on first boot of a fresh Keycloak container; after editing `docker/keycloak/realm-export.json`, recreate the container (`docker compose up -d --force-recreate keycloak`) to re-import.
+- Keycloak SSO sessions span :3000 and :4200 — logging in on one origin logs you in on the other (same realm cookie). Not a bug when switching between Docker and dev frontends.

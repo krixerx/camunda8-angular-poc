@@ -5,6 +5,14 @@ spring:
   application:
     name: backend
 
+# One canonical issuer (what tokens carry in `iss`) vs. a reachable JWKS URL:
+# in Docker the backend fetches keys via internal DNS (KEYCLOAK_JWKS_URI env,
+# see docker-compose.yml) while still validating the issuer claim against the
+# public localhost URL the browser used.
+keycloak:
+  issuer: ${KEYCLOAK_ISSUER:http://localhost:8180/realms/camunda-poc}
+  jwks-uri: ${KEYCLOAK_JWKS_URI:http://localhost:8180/realms/camunda-poc/protocol/openid-connect/certs}
+
 camunda:
   client:
     mode: self-managed

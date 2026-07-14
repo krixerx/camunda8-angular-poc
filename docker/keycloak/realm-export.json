@@ -1,0 +1,69 @@
+{
+  "realm": "camunda-poc",
+  "enabled": true,
+  "displayName": "Camunda 8 POC",
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "applicant",
+        "description": "Citizen who submits applications (starts process instances)"
+      },
+      {
+        "name": "civil-servant",
+        "description": "Official who reviews submissions (completes user tasks)"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "bart",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Bart",
+      "lastName": "Simpson",
+      "email": "bart@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bart",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["applicant"]
+    },
+    {
+      "username": "homer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Homer",
+      "lastName": "Simpson",
+      "email": "homer@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "homer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["civil-servant"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "poc-frontend",
+      "name": "Camunda 8 POC Angular SPA",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:4200/*"],
+      "webOrigins": ["+"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:4200/*"
+      }
+    }
+  ]
+}

@@ -3,6 +3,41 @@
 # Adapted from the official lightweight distribution:
 # https://github.com/camunda/camunda-distributions (docker-compose-8.9)
 services:
+  keycloak:
+    # Identity provider. Dev mode + realm auto-import; realm `camunda-poc`
+    # ships demo users bart/bart (applicant) and homer/homer (civil-servant).
+    # KC_HOSTNAME_URL pins one canonical issuer (http://localhost:8180) so
+    # tokens carry the same `iss` for the browser and for containers — the
+    # backend fetches JWKS via internal DNS but validates the issuer claim
+    # against this public URL.
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_URL: http://localhost:8180
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    mem_limit: 768m
+    restart: unless-stopped
+    # KC_HEALTH_ENABLED exposes /health/* on the management port (9000 in
+    # Keycloak 26+); a TCP probe is enough — once 9000 listens, early init
+    # and realm import have at least started.
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && exit 0 || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+      start_period: 20s
+    networks:
+      - camunda
+
   backend:
     build: ./backend
     container_name: backend
@@ -11,12 +46,16 @@ services:
     environment:
       - CAMUNDA_GRPC_ADDRESS=http://orchestration:26500
       - CAMUNDA_REST_ADDRESS=http://orchestration:8080
+      # JWKS fetched via internal DNS; issuer stays the canonical public URL
+      - KEYCLOAK_JWKS_URI=http://keycloak:8080/realms/camunda-poc/protocol/openid-connect/certs
     mem_limit: 768m
     restart: unless-stopped
     networks:
       - camunda
     depends_on:
       orchestration:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
 
   frontend:

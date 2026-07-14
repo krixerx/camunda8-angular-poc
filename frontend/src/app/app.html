@@ -1,10 +1,19 @@
 <header class="topbar">
   <span class="brand">Camunda 8 POC</span>
   <nav>
-    <a routerLink="/services" routerLinkActive="active">Services</a>
-    <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+    @if (auth.isApplicant) {
+      <a routerLink="/services" routerLinkActive="active">Services</a>
+    }
+    @if (auth.isCivilServant) {
+      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+    }
     <a routerLink="/processes" routerLinkActive="active">Processes</a>
   </nav>
+  <div class="user">
+    <span class="user-name">{{ auth.username }}</span>
+    <span class="user-role">{{ auth.isCivilServant ? 'civil servant' : 'applicant' }}</span>
+    <button type="button" class="logout" (click)="auth.logout()">Log out</button>
+  </div>
 </header>
 <main>
   <router-outlet />
