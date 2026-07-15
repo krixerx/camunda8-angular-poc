@@ -1,0 +1,85 @@
+[
+  {
+    "formId": "vehicle-registration-start",
+    "strings": {
+      "intro": {
+        "text": "## تسجيل مركبة\nأدخل بيانات المالك والمركبة لتسجيل المركبة."
+      },
+      "ownerName": {
+        "label": "اسم المالك"
+      },
+      "vin": {
+        "label": "رقم تعريف المركبة (VIN)",
+        "description": "17 خانة، أحرف لاتينية كبيرة وأرقام، بدون I/O/Q"
+      },
+      "category": {
+        "label": "فئة المركبة",
+        "values": {
+          "car": "سيارة",
+          "motorcycle": "دراجة نارية",
+          "truck": "شاحنة"
+        }
+      }
+    }
+  },
+  {
+    "formId": "review-registration",
+    "strings": {
+      "intro": {
+        "text": "## مراجعة التسجيل\nتحقق من البيانات المُرسلة والرسوم المحسوبة، ثم اعتمد الطلب أو ارفضه."
+      },
+      "ownerName": {
+        "label": "اسم المالك"
+      },
+      "vin": {
+        "label": "رقم تعريف المركبة (VIN)"
+      },
+      "category": {
+        "label": "فئة المركبة"
+      },
+      "price": {
+        "label": "رسوم التسجيل (يورو)"
+      },
+      "approved": {
+        "label": "اعتماد هذا التسجيل"
+      }
+    }
+  },
+  {
+    "formId": "business-registration-start",
+    "strings": {
+      "intro": {
+        "text": "## تسجيل شركة\nسجّل شركة (OÜ). تُعتمد تلقائيًا الطلبات التي دُفع فيها الحد الأدنى لرأس المال كاملًا (≥ 2500 يورو) ومؤسسوها بالغون."
+      },
+      "companyName": {
+        "label": "اسم الشركة"
+      },
+      "shareCapital": {
+        "label": "رأس المال (يورو)"
+      },
+      "founderAge": {
+        "label": "عمر المؤسس"
+      }
+    }
+  },
+  {
+    "formId": "review-application",
+    "strings": {
+      "intro": {
+        "text": "## مراجعة الطلب\nلم يُعتمد هذا الطلب تلقائيًا. تحقق من البيانات ثم اعتمده أو ارفضه."
+      },
+      "companyName": {
+        "label": "اسم الشركة"
+      },
+      "shareCapital": {
+        "label": "رأس المال (يورو)"
+      },
+      "founderAge": {
+        "label": "عمر المؤسس"
+      },
+      "approved": {
+        "label": "اعتماد هذا الطلب"
+      }
+    }
+  }
+]

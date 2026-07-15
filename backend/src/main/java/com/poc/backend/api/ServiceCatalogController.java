@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,7 +30,7 @@ public class ServiceCatalogController {
   }
 
   @GetMapping("/services")
-  public List<ServiceCatalogItem> services() {
+  public List<ServiceCatalogItem> services(@RequestParam(required = false) String locale) {
     var definitions =
         client
             .newProcessDefinitionSearchRequest()
@@ -39,7 +40,7 @@ public class ServiceCatalogController {
             .send()
             .join()
             .items();
-    return merge(definitions, strapiClient.fetchServicesById());
+    return merge(definitions, strapiClient.fetchServicesById(locale));
   }
 
   /**

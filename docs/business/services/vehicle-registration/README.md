@@ -63,6 +63,18 @@ Citizen-facing copy shown on the Services page and start page, owned by editors 
 | `whatYouNeed` | Vehicle identification number (VIN); vehicle category (car, motorcycle, or truck); your full name as the owner |
 | `expectedDuration` | 1-2 working days (fee: 80-250 EUR depending on category) |
 
+Arabic (`ar`) seeded values (developer-written, pending native-speaker review; source `cms/src/data/seed-services.ar.json`):
+
+| Field | Seeded value (ar) |
+|---|---|
+| `title` | تسجيل مركبة |
+| `summary` | سجّل سيارة أو دراجة نارية أو شاحنة باسمك. تُحسب رسوم التسجيل تلقائيًا ويراجع موظف رسمي طلبك. |
+| `instructions` | املأ بيانات المالك والمركبة ثم أرسل الطلب. تُحدَّد رسوم التسجيل تلقائيًا حسب فئة المركبة. بعد ذلك يراجع موظف رسمي طلبك وسترى النتيجة ضمن «عملياتي». |
+| `whatYouNeed` | رقم تعريف المركبة (VIN)؛ فئة المركبة (سيارة أو دراجة نارية أو شاحنة)؛ اسمك الكامل بصفتك المالك |
+| `expectedDuration` | 1–2 يوم عمل (الرسوم: 80–250 يورو حسب الفئة) |
+
+Arabic form labels for `vehicle-registration-start` and `review-registration` are seeded in `cms/src/data/seed-form-translations.json` (Strapi `form-translation` entries) — the deployed `.form` files stay English-only.
+
 ## Known trade-offs
 
 - Reviewer sees no vehicle registry data (no external lookup like cib7's Liiklusregister stub) — price map stands in for "integration".

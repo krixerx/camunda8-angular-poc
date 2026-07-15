@@ -41,6 +41,8 @@ User task forms are **Camunda Forms** (`.form` files deployed with the BPMN), re
 
 The Services page shows **editorial content from Strapi** (title, summary, instructions, expected duration) merged with the deployed process definitions by the backend (`GET /api/services`, joined on the BPMN process id). Content is seeded automatically on first boot; if Strapi is down the catalog degrades to raw engine data and stays fully functional.
 
+The UI is **bilingual: English and Arabic (RTL)** — the EN/AR switcher in the header flips the whole app to right-to-left Arabic, including the catalog content *and the deployed Camunda Forms*: the backend overlays Strapi-managed Arabic labels onto the form schemas at read time (`?locale=ar`), so translations are editable in the CMS without redeploying any form. Missing translations fall back to the authored English, string by string.
+
 ## Architecture
 
 ```mermaid
@@ -106,6 +108,8 @@ Author BPMN/DMN/forms with [Camunda Desktop Modeler](https://camunda.com/downloa
 ### Editing catalog content (Strapi)
 
 Open http://localhost:1337/admin — the first visit asks you to register a local admin account (any credentials; it is stored in Strapi's own SQLite volume). Edit an entry under **Content Manager → Service**, hit **Publish**, and reload the Services page: the new copy appears immediately, no redeploy. Content survives `docker compose down`/restart; `docker compose down -v` wipes it, after which the bootstrap hook re-seeds the two default entries from `cms/src/data/seed-services.json`.
+
+Content is bilingual: use the **locale switcher** in the Content Manager (top of the edit form) to switch between English and Arabic versions of an entry. **Form translation** entries hold the Arabic strings for the deployed Camunda Forms as JSON keyed by field key (`label`, `description`, select option labels by value, text views by id) — English form labels are authored in the `.form` files themselves and act as the fallback. Seeds: `cms/src/data/seed-services.ar.json` and `cms/src/data/seed-form-translations.json`.
 
 ## Deliberate POC trade-offs
 

@@ -3,6 +3,7 @@ package com.poc.backend.api;
 import com.poc.backend.api.dto.CompleteTaskRequest;
 import com.poc.backend.api.dto.TaskDetailDto;
 import com.poc.backend.api.dto.TaskDto;
+import com.poc.backend.strapi.FormTranslator;
 import io.camunda.client.CamundaClient;
 import io.camunda.client.api.command.ProblemException;
 import io.camunda.client.api.search.enums.UserTaskState;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -25,10 +27,13 @@ public class TaskController {
 
   private final CamundaClient client;
   private final ObjectMapper objectMapper;
+  private final FormTranslator formTranslator;
 
-  public TaskController(CamundaClient client, ObjectMapper objectMapper) {
+  public TaskController(
+      CamundaClient client, ObjectMapper objectMapper, FormTranslator formTranslator) {
     this.client = client;
     this.objectMapper = objectMapper;
+    this.formTranslator = formTranslator;
   }
 
   @GetMapping
@@ -46,9 +51,13 @@ public class TaskController {
   }
 
   @GetMapping("/{userTaskKey}")
-  public TaskDetailDto taskDetail(@PathVariable long userTaskKey) {
+  public TaskDetailDto taskDetail(
+      @PathVariable long userTaskKey, @RequestParam(required = false) String locale) {
     var task = client.newUserTaskGetRequest(userTaskKey).send().join();
-    return new TaskDetailDto(TaskDto.from(task), formSchema(userTaskKey), variables(userTaskKey));
+    return new TaskDetailDto(
+        TaskDto.from(task),
+        formTranslator.translate(formSchema(userTaskKey), locale),
+        variables(userTaskKey));
   }
 
   @PostMapping("/{userTaskKey}/complete")

@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "form_translations",
+  "info": {
+    "singularName": "form-translation",
+    "pluralName": "form-translations",
+    "displayName": "Form translation",
+    "description": "Per-locale presentational strings for a deployed Camunda Form, joined by the form id. English is authored in the .form file; only other locales live here."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "formId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "strings": {
+      "type": "json",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}

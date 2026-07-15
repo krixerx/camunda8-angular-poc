@@ -1,6 +1,7 @@
-import { Component, inject, input, signal, viewChild } from '@angular/core';
+import { Component, effect, inject, input, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
+import { LanguageService } from '../core/language.service';
 import { TaskDetail } from '../core/models';
 import { settle } from '../core/settle';
 import { FormViewer } from '../shared/form-viewer';
@@ -10,7 +11,7 @@ import { FormViewer } from '../shared/form-viewer';
   selector: 'app-task-detail-page',
   imports: [FormViewer, RouterLink],
   template: `
-    <p><a routerLink="/tasks">← Tasks</a></p>
+    <p><a routerLink="/tasks">{{ lang.t('task.back') }}</a></p>
     @if (error()) {
       <p class="error">{{ error() }}</p>
     }
@@ -20,7 +21,7 @@ import { FormViewer } from '../shared/form-viewer';
       @if (d.formSchema; as schema) {
         <app-form-viewer #form [schema]="schema" [data]="d.variables" />
       } @else {
-        <h2>Variables</h2>
+        <h2>{{ lang.t('task.variables') }}</h2>
         <table>
           @for (entry of variableEntries(); track entry[0]) {
             <tr>
@@ -30,13 +31,16 @@ import { FormViewer } from '../shared/form-viewer';
           }
         </table>
       }
-      <button class="button" [disabled]="submitting()" (click)="complete()">Complete task</button>
+      <button class="button" [disabled]="submitting()" (click)="complete()">
+        {{ lang.t('task.complete') }}
+      </button>
     }
   `,
 })
 export class TaskDetailPage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  protected readonly lang = inject(LanguageService);
 
   // route param (withComponentInputBinding)
   readonly userTaskKey = input.required<string>();
@@ -48,7 +52,11 @@ export class TaskDetailPage {
   private readonly formViewer = viewChild<FormViewer>('form');
 
   constructor() {
-    queueMicrotask(() => this.load());
+    // reloads whenever the language changes — the form schema is locale-aware
+    effect(() => {
+      this.lang.locale();
+      this.load();
+    });
   }
 
   variableEntries(): [string, unknown][] {
@@ -59,7 +67,7 @@ export class TaskDetailPage {
     try {
       this.detail.set(await this.api.taskDetail(Number(this.userTaskKey())));
     } catch (e: any) {
-      this.error.set(e?.error?.message ?? 'Failed to load task');
+      this.error.set(e?.error?.message ?? this.lang.t('task.loadFailed'));
     }
   }
 
@@ -82,7 +90,7 @@ export class TaskDetailPage {
       await settle();
       await this.router.navigate(['/tasks']);
     } catch (e: any) {
-      this.error.set(e?.error?.message ?? 'Failed to complete task');
+      this.error.set(e?.error?.message ?? this.lang.t('task.completeFailed'));
       this.submitting.set(false);
     }
   }

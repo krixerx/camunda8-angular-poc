@@ -1,6 +1,7 @@
-import { Component, inject, input, signal, viewChild } from '@angular/core';
+import { Component, effect, inject, input, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
+import { LanguageService } from '../core/language.service';
 import { FormSchema, ServiceCatalogItem } from '../core/models';
 import { settle } from '../core/settle';
 import { FormViewer } from '../shared/form-viewer';
@@ -8,13 +9,14 @@ import { FormViewer } from '../shared/form-viewer';
 /**
  * Renders a process start form (if any) and creates the instance. Editorial catalog
  * content (title, instructions) is shown when the CMS has it; the page works without it.
+ * Both the catalog content and the form schema arrive in the active language.
  */
 @Component({
   selector: 'app-start-process-page',
   imports: [FormViewer, RouterLink],
   template: `
-    <p><a routerLink="/services">← Services</a></p>
-    <h1>Start: {{ catalogItem()?.title ?? processDefinitionId() }}</h1>
+    <p><a routerLink="/services">{{ lang.t('start.back') }}</a></p>
+    <h1>{{ lang.t('start.title') }} {{ catalogItem()?.title ?? processDefinitionId() }}</h1>
     @if (error()) {
       <p class="error">{{ error() }}</p>
     }
@@ -23,7 +25,7 @@ import { FormViewer } from '../shared/form-viewer';
         <p class="instructions">{{ item.instructions }}</p>
       }
       @if (item.whatYouNeed) {
-        <h3>What you need</h3>
+        <h3>{{ lang.t('start.whatYouNeed') }}</h3>
         <p class="instructions">{{ item.whatYouNeed }}</p>
       }
     }
@@ -31,9 +33,11 @@ import { FormViewer } from '../shared/form-viewer';
       @if (formSchema(); as schema) {
         <app-form-viewer #form [schema]="schema" />
       } @else {
-        <p class="muted">This process has no start form.</p>
+        <p class="muted">{{ lang.t('start.noForm') }}</p>
       }
-      <button class="button" [disabled]="submitting()" (click)="start()">Start process</button>
+      <button class="button" [disabled]="submitting()" (click)="start()">
+        {{ lang.t('start.submit') }}
+      </button>
     }
   `,
   styles: `
@@ -45,6 +49,7 @@ import { FormViewer } from '../shared/form-viewer';
 export class StartProcessPage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  protected readonly lang = inject(LanguageService);
 
   // route params (withComponentInputBinding)
   readonly processDefinitionKey = input.required<string>();
@@ -59,7 +64,11 @@ export class StartProcessPage {
   private readonly formViewer = viewChild<FormViewer>('form');
 
   constructor() {
-    queueMicrotask(() => this.load());
+    // reloads content and schema whenever the language changes
+    effect(() => {
+      this.lang.locale();
+      this.load();
+    });
   }
 
   private async load(): Promise<void> {
@@ -75,7 +84,7 @@ export class StartProcessPage {
     try {
       this.formSchema.set(await this.api.startForm(Number(this.processDefinitionKey())));
     } catch (e: any) {
-      this.error.set(e?.error?.message ?? 'Failed to load start form');
+      this.error.set(e?.error?.message ?? this.lang.t('start.formLoadFailed'));
     } finally {
       this.loaded.set(true);
     }
@@ -100,7 +109,7 @@ export class StartProcessPage {
       await settle();
       await this.router.navigate(['/tasks']);
     } catch (e: any) {
-      this.error.set(e?.error?.message ?? 'Failed to start process');
+      this.error.set(e?.error?.message ?? this.lang.t('start.failed'));
       this.submitting.set(false);
     }
   }

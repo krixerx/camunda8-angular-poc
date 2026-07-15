@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
+import { LanguageService } from '../core/language.service';
 import { Task } from '../core/models';
 
 /** Worklist of open user tasks. */
@@ -10,8 +11,8 @@ import { Task } from '../core/models';
   imports: [RouterLink, DatePipe],
   template: `
     <div class="page-head">
-      <h1>Tasks</h1>
-      <button class="button" (click)="refresh()">Refresh</button>
+      <h1>{{ lang.t('tasks.title') }}</h1>
+      <button class="button" (click)="refresh()">{{ lang.t('tasks.refresh') }}</button>
     </div>
     @if (error()) {
       <p class="error">{{ error() }}</p>
@@ -23,19 +24,22 @@ import { Task } from '../core/models';
             <h2>{{ task.name }}</h2>
             <p class="muted">
               {{ task.processName ?? task.processDefinitionId }} ·
-              created {{ task.creationDate | date: 'short' }}
+              {{ lang.t('tasks.created') }} {{ task.creationDate | date: 'short' }}
             </p>
           </div>
-          <a class="button" [routerLink]="['/tasks', task.userTaskKey]">Open</a>
+          <a class="button" [routerLink]="['/tasks', task.userTaskKey]">
+            {{ lang.t('tasks.open') }}
+          </a>
         </div>
       } @empty {
-        <p class="muted">No open tasks.</p>
+        <p class="muted">{{ lang.t('tasks.empty') }}</p>
       }
     </div>
   `,
 })
 export class TasksPage {
   private readonly api = inject(ApiService);
+  protected readonly lang = inject(LanguageService);
 
   readonly tasks = signal<Task[]>([]);
   readonly error = signal<string | null>(null);
@@ -48,6 +52,6 @@ export class TasksPage {
     this.api
       .openTasks()
       .then((tasks) => this.tasks.set(tasks))
-      .catch((e) => this.error.set(e?.error?.message ?? 'Failed to load tasks'));
+      .catch((e) => this.error.set(e?.error?.message ?? this.lang.t('tasks.loadFailed')));
   }
 }

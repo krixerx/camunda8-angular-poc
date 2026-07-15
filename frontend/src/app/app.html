@@ -2,17 +2,35 @@
   <span class="brand">Camunda 8 POC</span>
   <nav>
     @if (auth.isApplicant) {
-      <a routerLink="/services" routerLinkActive="active">Services</a>
+      <a routerLink="/services" routerLinkActive="active">{{ lang.t('nav.services') }}</a>
     }
     @if (auth.isCivilServant) {
-      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+      <a routerLink="/tasks" routerLinkActive="active">{{ lang.t('nav.tasks') }}</a>
     }
-    <a routerLink="/processes" routerLinkActive="active">Processes</a>
+    <a routerLink="/processes" routerLinkActive="active">{{ lang.t('nav.processes') }}</a>
   </nav>
   <div class="user">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button
+        type="button"
+        [class.active]="lang.locale() === 'en'"
+        (click)="lang.set('en')"
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        [class.active]="lang.locale() === 'ar'"
+        (click)="lang.set('ar')"
+      >
+        AR
+      </button>
+    </div>
     <span class="user-name">{{ auth.username }}</span>
-    <span class="user-role">{{ auth.isCivilServant ? 'civil servant' : 'applicant' }}</span>
-    <button type="button" class="logout" (click)="auth.logout()">Log out</button>
+    <span class="user-role">{{
+      auth.isCivilServant ? lang.t('role.civilServant') : lang.t('role.applicant')
+    }}</span>
+    <button type="button" class="logout" (click)="auth.logout()">{{ lang.t('nav.logout') }}</button>
   </div>
 </header>
 <main>

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ApiService } from '../core/api.service';
+import { LanguageService } from '../core/language.service';
 import { ProcessInstance } from '../core/models';
 
 /** Overview of process instances and their states. */
@@ -8,17 +9,17 @@ import { ProcessInstance } from '../core/models';
   selector: 'app-processes-page',
   imports: [DatePipe],
   template: `
-    <h1>Processes</h1>
+    <h1>{{ lang.t('processes.title') }}</h1>
     @if (error()) {
       <p class="error">{{ error() }}</p>
     }
     <table>
       <thead>
         <tr>
-          <th>Process</th>
-          <th>State</th>
-          <th>Started</th>
-          <th>Ended</th>
+          <th>{{ lang.t('processes.process') }}</th>
+          <th>{{ lang.t('processes.state') }}</th>
+          <th>{{ lang.t('processes.started') }}</th>
+          <th>{{ lang.t('processes.ended') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -33,7 +34,7 @@ import { ProcessInstance } from '../core/models';
           </tr>
         } @empty {
           <tr>
-            <td colspan="4" class="muted">No process instances.</td>
+            <td colspan="4" class="muted">{{ lang.t('processes.empty') }}</td>
           </tr>
         }
       </tbody>
@@ -42,6 +43,7 @@ import { ProcessInstance } from '../core/models';
 })
 export class ProcessesPage {
   private readonly api = inject(ApiService);
+  protected readonly lang = inject(LanguageService);
 
   readonly instances = signal<ProcessInstance[]>([]);
   readonly error = signal<string | null>(null);
@@ -50,6 +52,6 @@ export class ProcessesPage {
     this.api
       .processInstances()
       .then((instances) => this.instances.set(instances))
-      .catch((e) => this.error.set(e?.error?.message ?? 'Failed to load process instances'));
+      .catch((e) => this.error.set(e?.error?.message ?? this.lang.t('processes.loadFailed')));
   }
 }

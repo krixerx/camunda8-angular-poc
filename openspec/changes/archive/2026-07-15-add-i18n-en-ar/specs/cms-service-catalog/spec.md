@@ -1,8 +1,5 @@
-# cms-service-catalog Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by syncing change add-strapi-service-catalog. Update Purpose after archive.
-## Requirements
 ### Requirement: Strapi hosts the service content type
 A Strapi v5 application (`cms/`, SQLite storage, version pinned) SHALL define a `service` collection type with draft & publish enabled and the fields: `title` (string, required), `summary` (text), `instructions` (rich text), `whatYouNeed` (rich text), `expectedDuration` (string), and `processDefinitionId` (string, required, unique) — the join key matching the BPMN process id of a deployed Camunda process definition. The collection SHALL use Strapi i18n with locales `en` (default) and `ar`: the content fields SHALL be localized per locale, while `processDefinitionId` SHALL be non-localized so all locale versions of a document share the join key. The content-type schema and locale configuration SHALL be committed to the repository.
 
@@ -18,21 +15,6 @@ A Strapi v5 application (`cms/`, SQLite storage, version pinned) SHALL define a 
 - **WHEN** an editor opens the Arabic locale version of a `service` document
 - **THEN** `processDefinitionId` is the same value as in the English version and is not independently editable per locale
 
-### Requirement: Published service content is readable without authentication
-The Strapi bootstrap hook SHALL grant the public role `find` and `findOne` permissions on the `service` content type, so the backend can read published entries without credentials. All write operations and the admin panel SHALL remain protected by Strapi's own authentication. Only published entries SHALL be returned by the public API; drafts SHALL NOT be visible.
-
-#### Scenario: Backend reads published entries
-- **WHEN** a client sends `GET /api/services` to the Strapi API (port 1337) without credentials
-- **THEN** Strapi returns HTTP 200 with the published `service` entries
-
-#### Scenario: Drafts are not exposed
-- **WHEN** an editor saves a `service` entry as draft without publishing and a client queries the public API
-- **THEN** the draft entry is absent from the response
-
-#### Scenario: Unauthenticated writes rejected
-- **WHEN** a client sends `POST /api/services` to the Strapi API without credentials
-- **THEN** Strapi responds with an error status (401/403/405) and no entry is created
-
 ### Requirement: Seed content on first boot
 The Strapi bootstrap hook SHALL create and publish `service` entries for `vehicle-registration` and `business-registration` in both `en` and `ar` locales from committed fixtures when no `service` entries exist, and SHALL add missing `ar` localizations to existing English documents (upgrade path for pre-i18n volumes). Seeding SHALL be idempotent: it is skipped when the corresponding content already exists, so editor changes survive restarts.
 
@@ -47,10 +29,3 @@ The Strapi bootstrap hook SHALL create and publish `service` entries for `vehicl
 #### Scenario: Editor changes survive restart
 - **WHEN** an editor edits a seeded entry and the Strapi container is restarted (volume retained)
 - **THEN** the edited content is served and the seed fixture does not overwrite it
-
-### Requirement: Content ownership boundary is documented
-`docs/architecture.md` SHALL document the ownership boundary: Camunda owns executable artifacts (BPMN, DMN, form schemas — versioned via deployment), Strapi owns editorial catalog content, and the two are joined by `processDefinitionId`. Executable artifacts SHALL NOT be stored in or served from Strapi.
-
-#### Scenario: Boundary documented
-- **WHEN** a developer reads `docs/architecture.md`
-- **THEN** it states which artifact types belong to Camunda, which content belongs to Strapi, and names `processDefinitionId` as the join key

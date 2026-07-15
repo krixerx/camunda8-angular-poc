@@ -63,6 +63,18 @@ Citizen-facing copy shown on the Services page and start page, owned by editors 
 | `whatYouNeed` | Proposed company name; planned share capital in EUR; founder's age |
 | `expectedDuration` | Instant for clear-cut cases, otherwise 1-2 working days |
 
+Arabic (`ar`) seeded values (developer-written, pending native-speaker review; source `cms/src/data/seed-services.ar.json`):
+
+| Field | Seeded value (ar) |
+|---|---|
+| `title` | تسجيل شركة |
+| `summary` | سجّل شركة جديدة (OÜ). تُعتمد الطلبات الواضحة تلقائيًا، ويراجع موظف رسمي بقية الطلبات. |
+| `instructions` | املأ اسم الشركة ورأس المال وبيانات المؤسس ثم أرسل الطلب. تُعتمد الحالات الواضحة فورًا بقرار آلي، وتُحال الطلبات الأخرى إلى مراجعة يدوية من موظف رسمي. |
+| `whatYouNeed` | اسم الشركة المقترح؛ رأس المال المخطط له باليورو؛ عمر المؤسس |
+| `expectedDuration` | فوري للحالات الواضحة، وإلا 1–2 يوم عمل |
+
+Arabic form labels for `business-registration-start` and `review-application` are seeded in `cms/src/data/seed-form-translations.json` (Strapi `form-translation` entries) — the deployed `.form` files stay English-only.
+
 ## Known trade-offs
 
 - One founder only (cib7's board members / founder-signature loop dropped on purpose).
