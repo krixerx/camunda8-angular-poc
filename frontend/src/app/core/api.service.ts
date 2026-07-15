@@ -5,6 +5,7 @@ import {
   FormSchema,
   ProcessDefinition,
   ProcessInstance,
+  ServiceCatalogItem,
   StartInstanceResponse,
   Task,
   TaskDetail,
@@ -17,6 +18,11 @@ export class ApiService {
 
   processDefinitions(): Promise<ProcessDefinition[]> {
     return firstValueFrom(this.http.get<ProcessDefinition[]>('/api/process-definitions'));
+  }
+
+  /** Service catalog: deployed definitions merged with editorial CMS content. */
+  services(): Promise<ServiceCatalogItem[]> {
+    return firstValueFrom(this.http.get<ServiceCatalogItem[]>('/api/services'));
   }
 
   /** Start form schema of a process definition, or null when it has none (HTTP 204). */

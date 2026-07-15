@@ -51,6 +51,18 @@ Keycloak realm roles (realm `camunda-poc`, see `docker/keycloak/realm-export.jso
 
 Any authenticated user may read process/task lists. Enforced by the backend (`SecurityConfig`) and mirrored in the frontend nav/route guards. No task assignment yet — every civil servant sees every open review task.
 
+## Catalog content (Strapi)
+
+Citizen-facing copy shown on the Services page and start page, owned by editors in the Strapi CMS (`service` entry joined on process id `vehicle-registration`). This table is the source of truth for the *seeded defaults* (`cms/src/data/seed-services.json`); editors may change the live copy in the admin panel without touching the repo.
+
+| Field | Seeded value |
+|---|---|
+| `title` | Vehicle registration |
+| `summary` | Register a car, motorcycle, or truck in your name. The registration fee is calculated automatically and an official reviews your application. |
+| `instructions` | Fill in the owner and vehicle details and submit the application. The registration fee is determined automatically from the vehicle category. An official then reviews your application and you will see the outcome under My processes. |
+| `whatYouNeed` | Vehicle identification number (VIN); vehicle category (car, motorcycle, or truck); your full name as the owner |
+| `expectedDuration` | 1-2 working days (fee: 80-250 EUR depending on category) |
+
 ## Known trade-offs
 
 - Reviewer sees no vehicle registry data (no external lookup like cib7's Liiklusregister stub) — price map stands in for "integration".

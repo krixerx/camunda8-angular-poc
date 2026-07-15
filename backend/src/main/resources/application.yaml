@@ -13,6 +13,11 @@ keycloak:
   issuer: ${KEYCLOAK_ISSUER:http://localhost:8180/realms/camunda-poc}
   jwks-uri: ${KEYCLOAK_JWKS_URI:http://localhost:8180/realms/camunda-poc/protocol/openid-connect/certs}
 
+# Editorial catalog content; docker-compose overrides with the service DNS.
+# The endpoint degrades to engine-only data when Strapi is unreachable.
+strapi:
+  base-url: ${STRAPI_URL:http://localhost:1337}
+
 camunda:
   client:
     mode: self-managed

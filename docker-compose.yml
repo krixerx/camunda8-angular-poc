@@ -38,6 +38,42 @@ services:
     networks:
       - camunda
 
+  strapi:
+    # Headless CMS for editorial service-catalog content. Seeds the two
+    # service entries and grants public read in its bootstrap hook, so a
+    # fresh volume starts populated with no manual step. Secrets are POC
+    # dummies (same spirit as Keycloak admin/admin). The backend reads it
+    # via internal DNS but does NOT hard-depend on it — the catalog
+    # degrades to engine-only data when Strapi is down.
+    build: ./cms
+    container_name: strapi
+    ports:
+      - "1337:1337" # admin panel + content API (also used by the dev-loop backend)
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+      APP_KEYS: poc-app-key-one,poc-app-key-two
+      API_TOKEN_SALT: poc-api-token-salt
+      ADMIN_JWT_SECRET: poc-admin-jwt-secret
+      TRANSFER_TOKEN_SALT: poc-transfer-token-salt
+      JWT_SECRET: poc-jwt-secret
+      ENCRYPTION_KEY: poc-encryption-key
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/data.db
+    volumes:
+      - strapi-data:/app/.tmp
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:1337/_health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks:
+      - camunda
+
   backend:
     build: ./backend
     container_name: backend
@@ -48,6 +84,7 @@ services:
       - CAMUNDA_REST_ADDRESS=http://orchestration:8080
       # JWKS fetched via internal DNS; issuer stays the canonical public URL
       - KEYCLOAK_JWKS_URI=http://keycloak:8080/realms/camunda-poc/protocol/openid-connect/certs
+      - STRAPI_URL=http://strapi:1337
     mem_limit: 768m
     restart: unless-stopped
     networks:
@@ -131,6 +168,7 @@ services:
 volumes:
   camunda:
   camunda-data:
+  strapi-data:
 
 networks:
   camunda:

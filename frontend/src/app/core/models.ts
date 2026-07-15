@@ -7,6 +7,22 @@ export interface ProcessDefinition {
   version: number;
 }
 
+/**
+ * Catalog entry from GET /api/services: engine identity plus optional editorial
+ * content from the CMS — content fields are null when Strapi has no entry or is down.
+ */
+export interface ServiceCatalogItem {
+  processDefinitionKey: number;
+  processDefinitionId: string;
+  name: string;
+  version: number;
+  title: string | null;
+  summary: string | null;
+  instructions: string | null;
+  whatYouNeed: string | null;
+  expectedDuration: string | null;
+}
+
 export interface ProcessInstance {
   processInstanceKey: number;
   processDefinitionId: string;

@@ -1,9 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
-import { ProcessDefinition } from '../core/models';
+import { ServiceCatalogItem } from '../core/models';
 
-/** Catalog of deployed processes; starting one navigates to the start page. */
+/**
+ * Service catalog; starting one navigates to the start page. Cards show editorial
+ * CMS content (title, summary) and fall back to engine name/id when there is none.
+ */
 @Component({
   selector: 'app-services-page',
   imports: [RouterLink],
@@ -13,15 +16,21 @@ import { ProcessDefinition } from '../core/models';
       <p class="error">{{ error() }}</p>
     }
     <div class="card-list">
-      @for (def of definitions(); track def.processDefinitionKey) {
+      @for (item of services(); track item.processDefinitionKey) {
         <div class="card">
           <div>
-            <h2>{{ def.name }}</h2>
-            <p class="muted">{{ def.processDefinitionId }} · v{{ def.version }}</p>
+            <h2>{{ item.title ?? item.name }}</h2>
+            @if (item.summary) {
+              <p>{{ item.summary }}</p>
+            }
+            @if (item.expectedDuration) {
+              <p class="muted">{{ item.expectedDuration }}</p>
+            }
+            <p class="muted">{{ item.processDefinitionId }} · v{{ item.version }}</p>
           </div>
           <a
             class="button"
-            [routerLink]="['/services', def.processDefinitionKey, def.processDefinitionId, 'start']"
+            [routerLink]="['/services', item.processDefinitionKey, item.processDefinitionId, 'start']"
           >
             Start
           </a>
@@ -35,13 +44,13 @@ import { ProcessDefinition } from '../core/models';
 export class ServicesPage {
   private readonly api = inject(ApiService);
 
-  readonly definitions = signal<ProcessDefinition[]>([]);
+  readonly services = signal<ServiceCatalogItem[]>([]);
   readonly error = signal<string | null>(null);
 
   constructor() {
     this.api
-      .processDefinitions()
-      .then((defs) => this.definitions.set(defs))
-      .catch((e) => this.error.set(e?.error?.message ?? 'Failed to load process definitions'));
+      .services()
+      .then((items) => this.services.set(items))
+      .catch((e) => this.error.set(e?.error?.message ?? 'Failed to load services'));
   }
 }

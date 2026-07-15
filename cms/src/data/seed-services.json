@@ -1,0 +1,18 @@
+[
+  {
+    "processDefinitionId": "vehicle-registration",
+    "title": "Vehicle registration",
+    "summary": "Register a car, motorcycle, or truck in your name. The registration fee is calculated automatically and an official reviews your application.",
+    "instructions": "Fill in the owner and vehicle details and submit the application. The registration fee is determined automatically from the vehicle category. An official then reviews your application and you will see the outcome under My processes.",
+    "whatYouNeed": "- Vehicle identification number (VIN)\n- Vehicle category (car, motorcycle, or truck)\n- Your full name as the owner",
+    "expectedDuration": "1-2 working days (fee: 80-250 EUR depending on category)"
+  },
+  {
+    "processDefinitionId": "business-registration",
+    "title": "Business registration",
+    "summary": "Register a new company (OU). Clear-cut applications are approved automatically; the rest are reviewed by an official.",
+    "instructions": "Fill in the company name, share capital, and founder details and submit the application. Clear-cut cases are approved instantly by an automated decision; other applications go to manual review by an official.",
+    "whatYouNeed": "- Proposed company name\n- Planned share capital in EUR\n- Founder's age",
+    "expectedDuration": "Instant for clear-cut cases, otherwise 1-2 working days"
+  }
+]

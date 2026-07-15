@@ -4,17 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Learning POC mirroring `C:\Users\kriks\git\cib7-react-poc` (CIB seven + React) on the Camunda 8 stack: **Camunda 8.9** orchestration cluster (Docker, H2 storage — no Elasticsearch) + **Spring Boot 4** middleware (`backend/`) + **Angular 22** SPA (`frontend/`). Two processes: `vehicle-registration` (job worker pricing) and `business-registration` (DMN auto-approval).
+Learning POC mirroring `C:\Users\kriks\git\cib7-react-poc` (CIB seven + React) on the Camunda 8 stack: **Camunda 8.9** orchestration cluster (Docker, H2 storage — no Elasticsearch) + **Spring Boot 4** middleware (`backend/`) + **Angular 22** SPA (`frontend/`) + **Strapi 5** CMS (`cms/`, SQLite) for editorial service-catalog content. Two processes: `vehicle-registration` (job worker pricing) and `business-registration` (DMN auto-approval).
 
 ## Commands
 
 ```bash
 # Full stack (everything in Docker)
-docker compose up --build -d          # frontend :3000, backend :8085, Camunda :8080/:26500
-docker compose down                   # -v wipes Camunda data (clean slate)
+docker compose up --build -d          # frontend :3000, backend :8085, Camunda :8080/:26500, Strapi :1337
+docker compose down                   # -v wipes Camunda data AND Strapi CMS content (clean slate)
 
-# Dev loop (cluster + Keycloak in Docker, apps local)
-docker compose up -d orchestration connectors keycloak
+# Dev loop (cluster + Keycloak + CMS in Docker, apps local)
+docker compose up -d orchestration connectors keycloak strapi
 cd backend && ./mvnw spring-boot:run  # :8085 — needs JDK 21+ (JAVA_HOME, not global PATH java=11)
 cd frontend && npm start              # :4200, proxies /api -> :8085 — needs Node >= 22.22.3
 
@@ -34,6 +34,8 @@ Auth: Keycloak :8180 (admin `admin`/`admin`), realm `camunda-poc` auto-imported 
 ## Architecture (read docs/architecture.md for detail)
 
 Browser → Keycloak login (keycloak-angular, code + PKCE, `login-required`; bearer interceptor + role route guards in `frontend/src/app/core/`) → Angular (`/api` same-origin; nginx proxy in Docker, ng-serve proxy in dev) → Spring Boot facade (`com.poc.backend.api`, thin controllers + DTO records in `api/dto` with static `from()` mappers) → `CamundaClient` → Orchestration Cluster **REST API v2 only** (v1 Tasklist/Operate APIs are removed in 8.10; client default `prefer-rest-over-grpc=true`, gRPC only for job streaming).
+
+Editorial catalog content: `GET /api/services` joins latest process definitions with Strapi's published `service` entries on `processDefinitionId` (`com.poc.backend.strapi.StrapiClient`, env `STRAPI_URL`, 2s timeout, degrades to engine-only items when Strapi is down). Camunda owns executable artifacts (BPMN/DMN/forms); Strapi owns citizen-facing copy (title, summary, instructions). Content model + seed live in `cms/src/` and are committed like code.
 
 BPMN/DMN/`.form` files live in `backend/src/main/resources/processes/<service>/` and auto-deploy at startup via `@Deployment` on `BackendApplication`. Job workers (`@JobWorker`) in `com.poc.backend.worker`. User tasks are **Camunda user tasks** (`zeebe:userTask`) with **linked forms** (`bindingType="deployment"`); DMN via `zeebe:calledDecision` (`bindingType="deployment"`). Frontend renders form schemas with `@bpmn-io/form-js-viewer` wrapped in `shared/form-viewer.ts`.
 
@@ -58,3 +60,6 @@ BPMN/DMN/`.form` files live in `backend/src/main/resources/processes/<service>/`
 - Keycloak issuer is pinned to `http://localhost:8180` (`KC_HOSTNAME_URL`) so browser- and container-validated tokens agree on `iss`. The backend fetches JWKS via a reachable URL (`KEYCLOAK_JWKS_URI`, service DNS in Docker) but validates `iss` against the canonical localhost URL — don't "simplify" either side or Docker mode breaks.
 - Realm JSON is only imported on first boot of a fresh Keycloak container; after editing `docker/keycloak/realm-export.json`, recreate the container (`docker compose up -d --force-recreate keycloak`) to re-import.
 - Keycloak SSO sessions span :3000 and :4200 — logging in on one origin logs you in on the other (same realm cookie). Not a bug when switching between Docker and dev frontends.
+- Strapi seeds content only when the `service` collection is empty (bootstrap hook in `cms/src/index.js`); after editing `cms/src/data/seed-services.json`, re-seed with `docker compose down -v` (wipes everything) or edit via the admin panel.
+- Strapi admin (:1337/admin) asks to register a local admin on first visit — unrelated to Keycloak; seeded content + public read work without it.
+- A BuildKit layer cached from a disk-full incident can bake corrupt `node_modules` into an image (symptom: `strapi start` exits 0 silently in a restart loop; direct `node .../strapi.js start` shows `ERR_INVALID_PACKAGE_CONFIG`) — rebuild with `docker compose build --no-cache <service>`.

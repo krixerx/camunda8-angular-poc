@@ -1,0 +1,10 @@
+node_modules
+.tmp
+.env
+.cache
+dist
+build
+strapi-dev.log
+README.md
+Dockerfile
+.dockerignore

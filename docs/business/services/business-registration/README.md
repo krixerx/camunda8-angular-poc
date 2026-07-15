@@ -51,6 +51,18 @@ Keycloak realm roles (realm `camunda-poc`, see `docker/keycloak/realm-export.jso
 
 Any authenticated user may read process/task lists. Enforced by the backend (`SecurityConfig`) and mirrored in the frontend nav/route guards. The DMN auto-approval path involves no human role at all.
 
+## Catalog content (Strapi)
+
+Citizen-facing copy shown on the Services page and start page, owned by editors in the Strapi CMS (`service` entry joined on process id `business-registration`). This table is the source of truth for the *seeded defaults* (`cms/src/data/seed-services.json`); editors may change the live copy in the admin panel without touching the repo.
+
+| Field | Seeded value |
+|---|---|
+| `title` | Business registration |
+| `summary` | Register a new company (OU). Clear-cut applications are approved automatically; the rest are reviewed by an official. |
+| `instructions` | Fill in the company name, share capital, and founder details and submit the application. Clear-cut cases are approved instantly by an automated decision; other applications go to manual review by an official. |
+| `whatYouNeed` | Proposed company name; planned share capital in EUR; founder's age |
+| `expectedDuration` | Instant for clear-cut cases, otherwise 1-2 working days |
+
 ## Known trade-offs
 
 - One founder only (cib7's board members / founder-signature loop dropped on purpose).

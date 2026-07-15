@@ -1,19 +1,31 @@
 import { Component, inject, input, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../core/api.service';
-import { FormSchema } from '../core/models';
+import { FormSchema, ServiceCatalogItem } from '../core/models';
 import { settle } from '../core/settle';
 import { FormViewer } from '../shared/form-viewer';
 
-/** Renders a process start form (if any) and creates the instance. */
+/**
+ * Renders a process start form (if any) and creates the instance. Editorial catalog
+ * content (title, instructions) is shown when the CMS has it; the page works without it.
+ */
 @Component({
   selector: 'app-start-process-page',
   imports: [FormViewer, RouterLink],
   template: `
     <p><a routerLink="/services">← Services</a></p>
-    <h1>Start: {{ processDefinitionId() }}</h1>
+    <h1>Start: {{ catalogItem()?.title ?? processDefinitionId() }}</h1>
     @if (error()) {
       <p class="error">{{ error() }}</p>
+    }
+    @if (catalogItem(); as item) {
+      @if (item.instructions) {
+        <p class="instructions">{{ item.instructions }}</p>
+      }
+      @if (item.whatYouNeed) {
+        <h3>What you need</h3>
+        <p class="instructions">{{ item.whatYouNeed }}</p>
+      }
     }
     @if (loaded()) {
       @if (formSchema(); as schema) {
@@ -22,6 +34,11 @@ import { FormViewer } from '../shared/form-viewer';
         <p class="muted">This process has no start form.</p>
       }
       <button class="button" [disabled]="submitting()" (click)="start()">Start process</button>
+    }
+  `,
+  styles: `
+    .instructions {
+      white-space: pre-line;
     }
   `,
 })
@@ -34,6 +51,7 @@ export class StartProcessPage {
   readonly processDefinitionId = input.required<string>();
 
   readonly formSchema = signal<FormSchema | null>(null);
+  readonly catalogItem = signal<ServiceCatalogItem | null>(null);
   readonly loaded = signal(false);
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
@@ -45,6 +63,15 @@ export class StartProcessPage {
   }
 
   private async load(): Promise<void> {
+    // Editorial content is best-effort: a failed catalog fetch never blocks the form.
+    this.api
+      .services()
+      .then((items) =>
+        this.catalogItem.set(
+          items.find((i) => i.processDefinitionId === this.processDefinitionId()) ?? null,
+        ),
+      )
+      .catch(() => this.catalogItem.set(null));
     try {
       this.formSchema.set(await this.api.startForm(Number(this.processDefinitionKey())));
     } catch (e: any) {
